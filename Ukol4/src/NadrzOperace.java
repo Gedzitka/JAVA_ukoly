@@ -1,13 +1,19 @@
 interface NadrzOperace {
-    void plnit(int mnozstvi) throws MyException_PlnaNadrz;
+    void plnit(double mnozstvi) throws PlnaNadrzException;
 
-    void odebrat(int mnozstvi) throws MyException_PrazdnaNadrz;
+    void odebrat(double mnozstvi) throws PrazdnaNadrzException;
 
-    int getAktualniStav();
+    double getAktualniStav();
 
     int getKapacita();
 
-    TypObsahu getTypObsahu();
+    String getOznaceni();
 
     String getStav();
+
+    String getSouhrnPridani();
+
+    String getSouhrnOdebrani();
+
+    String getSouhrnVse();
 }

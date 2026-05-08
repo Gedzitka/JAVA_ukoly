@@ -1,6 +1,5 @@
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -19,14 +18,15 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 
 class NadrzGUI extends JFrame {
+    private final JTextField oznaceniField = new JTextField("Nadrz-1", 12);
     private final JTextField kapacitaField = new JTextField("100", 8);
-    private final JTextField stavField = new JTextField("0", 8);
-    private final JTextField mnozstviField = new JTextField("10", 8);
-    private final JComboBox<TypObsahu> typComboBox = new JComboBox<>(TypObsahu.values());
+    private final JTextField stavField = new JTextField("0.0", 8);
+    private final JTextField mnozstviField = new JTextField("10.0", 8);
     private final JLabel stavLabel = new JLabel("Nádrž není vytvořena.");
     private final JTextArea logArea = new JTextArea(8, 32);
 
-    private NadrzOperace nadrz;
+    private Nadrz nadrz;
+    private Nadrz kopieNadrze;
 
     NadrzGUI() {
         super("Nádrž - ovládání");
@@ -50,9 +50,9 @@ class NadrzGUI extends JFrame {
         c.insets = new Insets(4, 4, 4, 4);
         c.anchor = GridBagConstraints.WEST;
 
-        pridatRadek(panel, c, 0, "Kapacita:", kapacitaField);
-        pridatRadek(panel, c, 1, "Počáteční stav:", stavField);
-        pridatRadek(panel, c, 2, "Typ obsahu:", typComboBox);
+        pridatRadek(panel, c, 0, "Označení:", oznaceniField);
+        pridatRadek(panel, c, 1, "Kapacita:", kapacitaField);
+        pridatRadek(panel, c, 2, "Počáteční stav:", stavField);
 
         JButton vytvoritButton = new JButton("Vytvořit / obnovit nádrž");
         vytvoritButton.addActionListener(e -> vytvorNadrz());
@@ -98,10 +98,31 @@ class NadrzGUI extends JFrame {
         odebratButton.setMaximumSize(new Dimension(220, 36));
         odebratButton.addActionListener(e -> provedOperaci(false));
 
+        JButton kopieButton = new JButton("Vytvořit kopii");
+        kopieButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        kopieButton.setMaximumSize(new Dimension(220, 36));
+        kopieButton.addActionListener(e -> vytvorKopii());
+
+        JButton porovnatButton = new JButton("Porovnat s kopií");
+        porovnatButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        porovnatButton.setMaximumSize(new Dimension(220, 36));
+        porovnatButton.addActionListener(e -> porovnejSKopii());
+
+        JButton historieButton = new JButton("Zobrazit souhrn historie");
+        historieButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        historieButton.setMaximumSize(new Dimension(220, 36));
+        historieButton.addActionListener(e -> zobrazSouhrnHistorie());
+
         tlacitka.add(Box.createVerticalStrut(8));
         tlacitka.add(naplnitButton);
         tlacitka.add(Box.createVerticalStrut(8));
         tlacitka.add(odebratButton);
+        tlacitka.add(Box.createVerticalStrut(8));
+        tlacitka.add(kopieButton);
+        tlacitka.add(Box.createVerticalStrut(8));
+        tlacitka.add(porovnatButton);
+        tlacitka.add(Box.createVerticalStrut(8));
+        tlacitka.add(historieButton);
 
         panel.add(tlacitka, BorderLayout.CENTER);
 
@@ -130,14 +151,15 @@ class NadrzGUI extends JFrame {
 
     private void vytvorNadrz() {
         try {
+            String oznaceni = oznaceniField.getText().trim();
             int kapacita = Integer.parseInt(kapacitaField.getText().trim());
-            int stav = Integer.parseInt(stavField.getText().trim());
-            TypObsahu typObsahu = (TypObsahu) typComboBox.getSelectedItem();
-            nadrz = new Nadrz(kapacita, typObsahu, stav);
+            double stav = Double.parseDouble(stavField.getText().trim());
+            nadrz = new Nadrz(kapacita, oznaceni, stav);
+            kopieNadrze = null;
             aktualizujStav();
             zapisDoLogu("Vytvořena nádrž: " + nadrz.getStav());
         } catch (NumberFormatException ex) {
-            zobrazChybu("Kapacita i počáteční stav musí být celá čísla.");
+            zobrazChybu("Kapacita musí být celé číslo a počáteční stav může být desetinný.");
         } catch (IllegalArgumentException ex) {
             zobrazChybu(ex.getMessage());
         }
@@ -150,7 +172,7 @@ class NadrzGUI extends JFrame {
         }
 
         try {
-            int mnozstvi = Integer.parseInt(mnozstviField.getText().trim());
+            double mnozstvi = Double.parseDouble(mnozstviField.getText().trim());
             if (plnit) {
                 nadrz.plnit(mnozstvi);
                 zapisDoLogu("Naplněno o " + mnozstvi + ". Stav: " + nadrz.getStav());
@@ -160,8 +182,8 @@ class NadrzGUI extends JFrame {
             }
             aktualizujStav();
         } catch (NumberFormatException ex) {
-            zobrazChybu("Množství musí být celé číslo.");
-        } catch (MyException_PlnaNadrz | MyException_PrazdnaNadrz | IllegalArgumentException ex) {
+            zobrazChybu("Množství musí být číslo.");
+        } catch (PlnaNadrzException | PrazdnaNadrzException | IllegalArgumentException ex) {
             zobrazChybu(ex.getMessage());
         }
     }
@@ -173,6 +195,37 @@ class NadrzGUI extends JFrame {
         }
 
         stavLabel.setText("Aktuální stav: " + nadrz.getStav());
+    }
+
+    private void vytvorKopii() {
+        if (nadrz == null) {
+            zobrazChybu("Nejprve vytvořte nádrž.");
+            return;
+        }
+
+        kopieNadrze = nadrz.kopie();
+        zapisDoLogu("Vytvořena kopie nádrže: " + kopieNadrze.getStav());
+    }
+
+    private void porovnejSKopii() {
+        if (nadrz == null || kopieNadrze == null) {
+            zobrazChybu("Nejprve vytvořte nádrž a její kopii.");
+            return;
+        }
+
+        zapisDoLogu("Porovnání s kopií: " + (nadrz.equals(kopieNadrze) ? "stejné" : "odlišné")
+                + ", stejný objekt: " + (nadrz == kopieNadrze));
+    }
+
+    private void zobrazSouhrnHistorie() {
+        if (nadrz == null) {
+            zobrazChybu("Nejprve vytvořte nádrž.");
+            return;
+        }
+
+        zapisDoLogu(nadrz.getSouhrnPridani());
+        zapisDoLogu(nadrz.getSouhrnOdebrani());
+        zapisDoLogu(nadrz.getSouhrnVse());
     }
 
     private void zobrazChybu(String message) {

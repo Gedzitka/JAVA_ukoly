@@ -14,26 +14,35 @@ public class Main {
             System.out.println("Neznámý režim, spouštím konzolovou ukázku.");
         }
 
-        NadrzOperace nadrz = new Nadrz(100, TypObsahu.VODA, 25);
+        Nadrz nadrz = new Nadrz(100, "Hlavní nádrž", 25.5);
         System.out.println("Vytvořena nádrž: " + nadrz.getStav());
 
         try {
-            nadrz.plnit(30);
+            nadrz.plnit(30.25);
             System.out.println("Po naplnění: " + nadrz.getStav());
 
-            nadrz.odebrat(20);
+            nadrz.odebrat(20.5);
             System.out.println("Po odebrání: " + nadrz.getStav());
 
+            Nadrz kopie = nadrz.kopie();
+            System.out.println("Kopie: " + kopie.getStav());
+            System.out.println("Stejný objekt: " + (nadrz == kopie));
+            System.out.println("Stejný obsah: " + nadrz.equals(kopie));
+
             nadrz.odebrat(60);
-        } catch (MyException_PlnaNadrz | MyException_PrazdnaNadrz e) {
+        } catch (PlnaNadrzException | PrazdnaNadrzException e) {
             System.err.println(e.getMessage());
         }
 
         try {
             nadrz.plnit(80);
-        } catch (MyException_PlnaNadrz e) {
+        } catch (PlnaNadrzException e) {
             System.err.println(e.getMessage());
         }
+
+        System.out.println(nadrz.getSouhrnPridani());
+        System.out.println(nadrz.getSouhrnOdebrani());
+        System.out.println(nadrz.getSouhrnVse());
     }
 
     private static String vyberRezim() {
