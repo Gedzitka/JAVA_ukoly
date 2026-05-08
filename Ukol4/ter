@@ -1,0 +1,378 @@
+[1mdiff --git a/.idea/modules.xml b/.idea/modules.xml[m
+[1mindex 6111796..365141a 100644[m
+[1m--- a/.idea/modules.xml[m
+[1m+++ b/.idea/modules.xml[m
+[36m@@ -2,7 +2,7 @@[m
+ <project version="4">[m
+   <component name="ProjectModuleManager">[m
+     <modules>[m
+[31m-      <module fileurl="file://$PROJECT_DIR$/HraPosunPoSachovnici.iml" filepath="$PROJECT_DIR$/HraPosunPoSachovnici.iml" />[m
+[32m+[m[32m      <module fileurl="file://$PROJECT_DIR$/ukol4.iml" filepath="$PROJECT_DIR$/ukol4.iml" />[m
+     </modules>[m
+   </component>[m
+ </project>[m
+\ No newline at end of file[m
+[1mdiff --git a/.idea/vcs.xml b/.idea/vcs.xml[m
+[1mdeleted file mode 100644[m
+[1mindex 94a25f7..0000000[m
+[1m--- a/.idea/vcs.xml[m
+[1m+++ /dev/null[m
+[36m@@ -1,6 +0,0 @@[m
+[31m-<?xml version="1.0" encoding="UTF-8"?>[m
+[31m-<project version="4">[m
+[31m-  <component name="VcsDirectoryMappings">[m
+[31m-    <mapping directory="$PROJECT_DIR$" vcs="Git" />[m
+[31m-  </component>[m
+[31m-</project>[m
+\ No newline at end of file[m
+[1mdiff --git a/src/Barva.java b/src/Barva.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1dd6948[m
+[1m--- /dev/null[m
+[1m+++ b/src/Barva.java[m
+[36m@@ -0,0 +1,7 @@[m
+[32m+[m[32mabstract class Barva {[m
+[32m+[m[32m    // Abstraktní metoda pro výpočet intenzity[m
+[32m+[m[32m    public abstract double getIntenzita();[m
+[32m+[m
+[32m+[m[32m    // Metoda pro převod barvy na hexadecimální formát[m
+[32m+[m[32m    public abstract String toHex();[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/BarvaCMYK.java b/src/BarvaCMYK.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e20807e[m
+[1m--- /dev/null[m
+[1m+++ b/src/BarvaCMYK.java[m
+[36m@@ -0,0 +1,20 @@[m
+[32m+[m[32mclass BarvaCMYK extends Barva {[m
+[32m+[m[32m    private double c, m, y, k;[m
+[32m+[m
+[32m+[m[32m    public BarvaCMYK(double c, double m, double y, double k) {[m
+[32m+[m[32m        this.c = c;[m
+[32m+[m[32m        this.m = m;[m
+[32m+[m[32m        this.y = y;[m
+[32m+[m[32m        this.k = k;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public double getIntenzita() {[m
+[32m+[m[32m        return 1 - Math.min(1, c + k); // Intenzita v modelu CMYK[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public String toHex() {[m
+[32m+[m[32m        return String.format("c:%.2f;m:%.2f;y:%.2f;k:%.2f", c, m, y, k);[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/BarvaRGB.java b/src/BarvaRGB.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4e21e73[m
+[1m--- /dev/null[m
+[1m+++ b/src/BarvaRGB.java[m
+[36m@@ -0,0 +1,15 @@[m
+[32m+[m[32mabstract class BarvaRGB extends Barva {[m
+[32m+[m[32m    protected int r, g, b;[m
+[32m+[m
+[32m+[m[32m    public BarvaRGB(int r, int g, int b) {[m
+[32m+[m[32m        this.r = r;[m
+[32m+[m[32m        this.g = g;[m
+[32m+[m[32m        this.b = b;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Metoda pro převod barvy na hexadecimální formát[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public String toHex() {[m
+[32m+[m[32m        return String.format("r:%02X;g:%02X;b:%02X", r, g, b);[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/BarvaRGB1.java b/src/BarvaRGB1.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1055e03[m
+[1m--- /dev/null[m
+[1m+++ b/src/BarvaRGB1.java[m
+[36m@@ -0,0 +1,11 @@[m
+[32m+[m[32mclass BarvaRGB1 extends BarvaRGB {[m
+[32m+[m[32m    public BarvaRGB1(int r, int g, int b) {[m
+[32m+[m[32m        super(r, g, b);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public double getIntenzita() {[m
+[32m+[m[32m        // Průměr složek RGB[m
+[32m+[m[32m        return (r + g + b) / 3.0;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/BarvaRGB2.java b/src/BarvaRGB2.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..8b13af6[m
+[1m--- /dev/null[m
+[1m+++ b/src/BarvaRGB2.java[m
+[36m@@ -0,0 +1,11 @@[m
+[32m+[m[32mclass BarvaRGB2 extends BarvaRGB {[m
+[32m+[m[32m    public BarvaRGB2(int r, int g, int b) {[m
+[32m+[m[32m        super(r, g, b);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public double getIntenzita() {[m
+[32m+[m[32m        // Vážený průměr složek RGB[m
+[32m+[m[32m        return 0.3 * r + 0.59 * g + 0.11 * b;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/HraPosunPoSachovnici$1.class b/src/HraPosunPoSachovnici$1.class[m
+[1mdeleted file mode 100644[m
+[1mindex 2fb9588..0000000[m
+Binary files a/src/HraPosunPoSachovnici$1.class and /dev/null differ
+[1mdiff --git a/src/HraPosunPoSachovnici.class b/src/HraPosunPoSachovnici.class[m
+[1mdeleted file mode 100644[m
+[1mindex a5101d7..0000000[m
+Binary files a/src/HraPosunPoSachovnici.class and /dev/null differ
+[1mdiff --git a/src/HraPosunPoSachovnici.java b/src/HraPosunPoSachovnici.java[m
+[1mdeleted file mode 100644[m
+[1mindex ee7bae7..0000000[m
+[1m--- a/src/HraPosunPoSachovnici.java[m
+[1m+++ /dev/null[m
+[36m@@ -1,43 +0,0 @@[m
+[31m-import java.util.ArrayList;[m
+[31m-import java.util.List;[m
+[31m-[m
+[31m-public class HraPosunPoSachovnici {[m
+[31m-    private final int nx, ny;[m
+[31m-    private int x, y;[m
+[31m-    private final List<String> historie;[m
+[31m-[m
+[31m-    public HraPosunPoSachovnici(int nx, int ny) {[m
+[31m-        this.nx = nx;[m
+[31m-        this.ny = ny;[m
+[31m-        this.x = 0;[m
+[31m-        this.y = 0;[m
+[31m-        this.historie = new ArrayList<>();[m
+[31m-        this.historie.add("[0;0]");[m
+[31m-    }[m
+[31m-[m
+[31m-    public void posun(SmerPohybu smer) {[m
+[31m-        switch (smer) {[m
+[31m-            case LEFT:[m
+[31m-                if (y > 0) y--;[m
+[31m-                break;[m
+[31m-            case RIGHT:[m
+[31m-                if (y < ny - 1) y++;[m
+[31m-                break;[m
+[31m-            case UP:[m
+[31m-                if (x > 0) x--;[m
+[31m-                break;[m
+[31m-            case DOWN:[m
+[31m-                if (x < nx - 1) x++;[m
+[31m-                break;[m
+[31m-        }[m
+[31m-        historie.add("[" + x + ";" + y + "]");[m
+[31m-    }[m
+[31m-[m
+[31m-    public String zobrazAktualniPolohu() {[m
+[31m-        return "[" + x + ";" + y + "]";[m
+[31m-    }[m
+[31m-[m
+[31m-    public List<String> zobrazHistorii() {[m
+[31m-        return new ArrayList<>(historie);[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/src/Main.java b/src/Main.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..91b7a00[m
+[1m--- /dev/null[m
+[1m+++ b/src/Main.java[m
+[36m@@ -0,0 +1,28 @@[m
+[32m+[m[32mpublic class Main {[m
+[32m+[m[32m    public static void main(String[] args) {[m
+[32m+[m[32m        // Testování RGB barev[m
+[32m+[m[32m        BarvaRGB barva1 = new BarvaRGB1(100, 150, 200);[m
+[32m+[m[32m        BarvaRGB barva2 = new BarvaRGB2(50, 75, 100);[m
+[32m+[m
+[32m+[m[32m        System.out.println("Barva1 (průměr): " + barva1.getIntenzita());[m
+[32m+[m[32m        System.out.println("Barva2 (vážený průměr): " + barva2.getIntenzita());[m
+[32m+[m
+[32m+[m[32m        // Výstup pro hexadecimální formát[m
+[32m+[m[32m        System.out.println("Barva1 (Hex): " + barva1.toHex());[m
+[32m+[m[32m        System.out.println("Barva2 (Hex): " + barva2.toHex());[m
+[32m+[m
+[32m+[m[32m        // Testování nádrže[m
+[32m+[m[32m        try {[m
+[32m+[m[32m            Nadrz nadrz = new Nadrz(100, TypObsahu.VODA);[m
+[32m+[m[32m            nadrz.plnit(50);[m
+[32m+[m[32m            System.out.println(nadrz.getStav());[m
+[32m+[m
+[32m+[m[32m            nadrz.odebrat(30);[m
+[32m+[m[32m            System.out.println(nadrz.getStav());[m
+[32m+[m
+[32m+[m[32m            nadrz.plnit(80); // Vyvolá výjimku[m
+[32m+[m[32m        } catch (Exception e) {[m
+[32m+[m[32m            System.err.println(e.getMessage());[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/MyException_PlnaNadrz.java b/src/MyException_PlnaNadrz.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d7e7958[m
+[1m--- /dev/null[m
+[1m+++ b/src/MyException_PlnaNadrz.java[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32mclass MyException_PlnaNadrz extends Exception {[m
+[32m+[m[32m    public MyException_PlnaNadrz(String message) {[m
+[32m+[m[32m        super(message);[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/MyException_PrazdnaNadrz.java b/src/MyException_PrazdnaNadrz.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ba1b9d0[m
+[1m--- /dev/null[m
+[1m+++ b/src/MyException_PrazdnaNadrz.java[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32mclass MyException_PrazdnaNadrz extends Exception {[m
+[32m+[m[32m    public MyException_PrazdnaNadrz(String message) {[m
+[32m+[m[32m        super(message);[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/NacteniHodnot.class b/src/NacteniHodnot.class[m
+[1mdeleted file mode 100644[m
+[1mindex 3c402dc..0000000[m
+Binary files a/src/NacteniHodnot.class and /dev/null differ
+[1mdiff --git a/src/NacteniHodnot.java b/src/NacteniHodnot.java[m
+[1mdeleted file mode 100644[m
+[1mindex 082e9c9..0000000[m
+[1m--- a/src/NacteniHodnot.java[m
+[1m+++ /dev/null[m
+[36m@@ -1,16 +0,0 @@[m
+[31m-import java.util.Scanner;[m
+[31m-[m
+[31m-public class NacteniHodnot {[m
+[31m-    private static Scanner scanner = new Scanner(System.in);[m
+[31m-[m
+[31m-    // Metoda pro načtení celého čísla[m
+[31m-    public static int nactiCislo(String vyzva) {[m
+[31m-        System.out.print(vyzva);[m
+[31m-        while (!scanner.hasNextInt()) {[m
+[31m-            System.out.println("Neplatný vstup, zadejte celé číslo.");[m
+[31m-            scanner.next(); // Vyčistit neplatný vstup[m
+[31m-            System.out.print(vyzva);[m
+[31m-        }[m
+[31m-        return scanner.nextInt();[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/src/Nadrz.java b/src/Nadrz.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ebee354[m
+[1m--- /dev/null[m
+[1m+++ b/src/Nadrz.java[m
+[36m@@ -0,0 +1,30 @@[m
+[32m+[m[32mclass Nadrz {[m
+[32m+[m[32m    private int stav;[m
+[32m+[m[32m    private final int kapacita;[m
+[32m+[m[32m    private final TypObsahu typObsahu;[m
+[32m+[m
+[32m+[m[32m    public Nadrz(int kapacita, TypObsahu typObsahu) {[m
+[32m+[m[32m        this.kapacita = kapacita;[m
+[32m+[m[32m        this.typObsahu = typObsahu;[m
+[32m+[m[32m        this.stav = 0; // Po vytvoření je nádrž prázdná[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public void plnit(int mnozstvi) throws MyException_PlnaNadrz {[m
+[32m+[m[32m        if (stav + mnozstvi > kapacita) {[m
+[32m+[m[32m            throw new MyException_PlnaNadrz("Nádrž je plná. Nelze přidat " + mnozstvi);[m
+[32m+[m[32m        }[m
+[32m+[m[32m        stav += mnozstvi;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public void odebrat(int mnozstvi) throws MyException_PrazdnaNadrz {[m
+[32m+[m[32m        if (stav - mnozstvi < 0) {[m
+[32m+[m[32m            throw new MyException_PrazdnaNadrz("Nádrž je prázdná. Nelze odebrat " + mnozstvi);[m
+[32m+[m[32m        }[m
+[32m+[m[32m        stav -= mnozstvi;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public String getStav() {[m
+[32m+[m[32m        int procenta = (stav * 100) / kapacita;[m
+[32m+[m[32m        return String.format("%d/%d (%d%%), %s", stav, kapacita, procenta, typObsahu);[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/RealizaceHryKonzola.class b/src/RealizaceHryKonzola.class[m
+[1mdeleted file mode 100644[m
+[1mindex 9b774fa..0000000[m
+Binary files a/src/RealizaceHryKonzola.class and /dev/null differ
+[1mdiff --git a/src/RealizaceHryKonzola.java b/src/RealizaceHryKonzola.java[m
+[1mdeleted file mode 100644[m
+[1mindex 818750f..0000000[m
+[1m--- a/src/RealizaceHryKonzola.java[m
+[1m+++ /dev/null[m
+[36m@@ -1,46 +0,0 @@[m
+[31m-import java.util.Scanner;[m
+[31m-[m
+[31m-public class RealizaceHryKonzola {[m
+[31m-    public static void main(String[] args) {[m
+[31m-        Scanner scanner = new Scanner(System.in);[m
+[31m-        System.out.println("Zadejte velikost šachovnice (nx ny):");[m
+[31m-        int nx = scanner.nextInt();[m
+[31m-        int ny = scanner.nextInt();[m
+[31m-[m
+[31m-        HraPosunPoSachovnici hra = new HraPosunPoSachovnici(nx, ny);[m
+[31m-[m
+[31m-        System.out.println("Hra začíná! Použijte <L>, <R>, <U>, <D> pro pohyb. <K> pro ukončení.");[m
+[31m-        while (true) {[m
+[31m-            System.out.print("Vaše volba: ");[m
+[31m-            String vstup = scanner.next().toUpperCase();[m
+[31m-[m
+[31m-            if (vstup.equals("K")) {[m
+[31m-                System.out.println("Hra ukončena.");[m
+[31m-                break;[m
+[31m-            }[m
+[31m-[m
+[31m-            switch (vstup) {[m
+[31m-                case "L":[m
+[31m-                    hra.posun(SmerPohybu.LEFT);[m
+[31m-                    break;[m
+[31m-                case "R":[m
+[31m-                    hra.posun(SmerPohybu.RIGHT);[m
+[31m-                    break;[m
+[31m-                case "U":[m
+[31m-                    hra.posun(SmerPohybu.UP);[m
+[31m-                    break;[m
+[31m-                case "D":[m
+[31m-                    hra.posun(SmerPohybu.DOWN);[m
+[31m-                    break;[m
+[31m-                default:[m
+[31m-                    System.out.println("Neplatná volba.");[m
+[31m-                    continue;[m
+[31m-            }[m
+[31m-[m
+[31m-            System.out.println("Aktuální poloha: " + hra.zobrazAktualniPolohu());[m
+[31m-            System.out.println("Historie pohybu: " + hra.zobrazHistorii());[m
+[31m-        }[m
+[31m-[m
+[31m-        scanner.close();[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/src/SmerPohybu.class b/src/SmerPohybu.class[m
+[1mdeleted file mode 100644[m
+[1mindex 8e0c319..0000000[m
+Binary files a/src/SmerPohybu.class and /dev/null differ
+[1mdiff --git a/src/SmerPohybu.java b/src/SmerPohybu.java[m
+[1mdeleted file mode 100644[m
+[1mindex 7df3f33..0000000[m
+[1m--- a/src/SmerPohybu.java[m
+[1m+++ /dev/null[m
+[36m@@ -1,3 +0,0 @@[m
+[31m-public enum SmerPohybu {[m
+[31m-    LEFT, RIGHT, UP, DOWN[m
+[31m-}[m
+[1mdiff --git a/src/TypObsahu.java b/src/TypObsahu.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e65b214[m
+[1m--- /dev/null[m
+[1m+++ b/src/TypObsahu.java[m
+[36m@@ -0,0 +1,3 @@[m
+[32m+[m[32menum TypObsahu {[m
+[32m+[m[32m    VODA, BENZIN, OLEJ[m
+[32m+[m[32m}[m
+[1mdiff --git a/HraPosunPoSachovnici.iml b/ukol4.iml[m
+[1msimilarity index 100%[m
+[1mrename from HraPosunPoSachovnici.iml[m
+[1mrename to ukol4.iml[m
